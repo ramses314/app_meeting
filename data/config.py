@@ -11,3 +11,10 @@ BOT_TOKEN = env.str('BOT_TOKEN')  # Забираем значение типа s
 ADMINS = env.list("ADMINS")  # Тут у нас будет список из админов
 IP = env.str("ip")  # Тоже str, но для айпи адреса хоста
 
+
+#postegre
+host = '127.0.0.1'
+user = 'postgres'
+password = 'gtx97'
+db_name = 'postgres'
+port = 5432
