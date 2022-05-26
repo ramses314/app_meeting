@@ -173,6 +173,6 @@ async def save_and_warning(message : types.Message, state : FSMContext):
                     )
         connection.commit()
 
-    await message.answer('Ну вот и все')
+    await message.answer('Ну вот и все ищи единомышлеников /search')
     await state.finish()
 

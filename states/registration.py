@@ -21,3 +21,5 @@ class EditingProfil(StatesGroup):
     begin = State()
     save = State()
 
+class ProfilOther(StatesGroup):
+    begin = State()

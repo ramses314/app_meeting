@@ -145,3 +145,40 @@ async def update_profil(table, value, id):
             f"UPDATE main_profil SET {table} = '{value}' WHERE indx = '{id}';"
         )
         connection.commit()
+
+async def update_profil_add(table, value, id):
+
+    connection = psycopg2.connect(
+        host=host,
+        user=user,
+        password=password,
+        database=db_name
+    )
+
+    cursor = connection.cursor()
+
+
+
+    with connection.cursor() as cur:
+        cur.execute(f"SELECT disease FROM main_profil WHERE indx = '{id}';")
+        a = cur.fetchall()
+        print(2222, a, 4444, cur.fetchall)
+        b = ',\n'
+        cur.execute(f"UPDATE main_profil SET {table} = '{a[0][0]}{b}{value}' WHERE indx = '{id}';")
+        connection.commit()
+
+
+async def send_search_db(id, disease):
+
+    connection = psycopg2.connect(
+        host=host,
+        user=user,
+        password=password,
+        database=db_name
+    )
+    cursor = connection.cursor()
+
+    with connection.cursor() as cur:
+        cur.execute(f"SELECT * FROM main_profil WHERE disease IN {tuple(disease)};")
+        a = cur.fetchall()
+        return a
