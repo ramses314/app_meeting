@@ -1,12 +1,9 @@
-import psycopg2
 from aiogram import types
-from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import CommandStart, CommandHelp
 from aiogram.types import ParseMode, InlineKeyboardMarkup, InlineKeyboardButton
 
-from data.config import *
 from db.create_db import *
-from keyboards.inline.kb_profil import send_panel_profil
+from keyboards.kb_search import send_first_search
 from loader import dp, bot
 from states.registration import Registration
 
@@ -49,26 +46,12 @@ async def show_profil(message : types.Message):
     await bot.send_photo(message.chat.id, a[9], caption='\n'.join(text) ,parse_mode=ParseMode.MARKDOWN,
                          reply_markup=markup)
 
-
+# начало поиска для знакомства
 @dp.message_handler(commands='search', state=None)
 async def send_search(message : types.Message):
-    await message.answer('Держи')
     a = (await send_profil(message.chat.id))[0][7]
-    c = len(a.split(',\n'))
-
-    if c > 1:
-        b = (await send_search_db(message.chat.id, a.split(',\n')))
-        print(5656, b)
-        pass
-    else:
-        pass
-    # b = (await send_search_db(message.chat.id))
-
-
-
-
-
-
+    selected = (await send_search_db(message.chat.id, a.split(',\n')))
+    await send_first_search(message, selected)
 
 
 @dp.message_handler(state=None)

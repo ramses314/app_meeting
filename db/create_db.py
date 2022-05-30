@@ -162,7 +162,7 @@ async def update_profil_add(table, value, id):
     with connection.cursor() as cur:
         cur.execute(f"SELECT disease FROM main_profil WHERE indx = '{id}';")
         a = cur.fetchall()
-        print(2222, a, 4444, cur.fetchall)
+        # print(2222, a, 4444, cur.fetchall)
         b = ',\n'
         cur.execute(f"UPDATE main_profil SET {table} = '{a[0][0]}{b}{value}' WHERE indx = '{id}';")
         connection.commit()
@@ -178,7 +178,16 @@ async def send_search_db(id, disease):
     )
     cursor = connection.cursor()
 
+    selected = []
+    list_already_added = ('some', f'{id}',)
+
     with connection.cursor() as cur:
-        cur.execute(f"SELECT * FROM main_profil WHERE disease IN {tuple(disease)};")
-        a = cur.fetchall()
-        return a
+        for item in disease:
+            cur.execute(f"SELECT * FROM main_profil WHERE disease LIKE '%{item}%' AND indx NOT IN {list_already_added};")
+            a = cur.fetchall()
+
+            for i in a:
+                selected.append(i)
+                list_already_added = list_already_added + (f'{i[11]}',)
+
+        return selected

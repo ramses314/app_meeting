@@ -1,14 +1,10 @@
-import psycopg2
-from aiogram import types
-
 from aiogram.dispatcher import FSMContext
-from aiogram.dispatcher.filters import CommandStart, CommandHelp, Text
+from aiogram.dispatcher.filters import Text
 
-from data.config import *
 from db.create_db import *
-from keyboards.inline.kb_profil import *
+from keyboards.kb_profil import *
 from keyboards.kb_auth import *
-from loader import dp, bot
+from loader import bot
 from states.registration import *
 
 # Шаблоны
