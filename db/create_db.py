@@ -91,28 +91,6 @@ async def send_db_sick(table):
 
 
 async def send_profil(id):
-    # try:
-    #     connection = psycopg2.connect(
-    #         host=host,
-    #         user=user,
-    #         password=password,
-    #         database=db_name
-    #     )
-    #
-    #     cursor = connection.cursor()
-    #     with connection.cursor() as cur:
-    #         global v
-    #         v = cur.execute(f'SELECT * FROM main_profil WHERE indx = "{id}";')
-    #         return cur.fetchall()
-    #
-    # except Exception as _ex:
-    #     print(['kmlmmlm'], _ex)
-    #
-    # finally:
-    #     pass
-    # # a = cur.fetchall()
-    # # print(a, cur.fetchall())
-    # return cur.fetchall()
 
     connection = psycopg2.connect(
         host=host,
@@ -126,7 +104,6 @@ async def send_profil(id):
         cur.execute(f"SELECT * FROM main_profil WHERE indx = '{id}';")
         a = cur.fetchall()
         return a
-
 
 
 async def update_profil(table, value, id):
@@ -157,18 +134,15 @@ async def update_profil_add(table, value, id):
 
     cursor = connection.cursor()
 
-
-
     with connection.cursor() as cur:
         cur.execute(f"SELECT disease FROM main_profil WHERE indx = '{id}';")
         a = cur.fetchall()
-        # print(2222, a, 4444, cur.fetchall)
         b = ',\n'
         cur.execute(f"UPDATE main_profil SET {table} = '{a[0][0]}{b}{value}' WHERE indx = '{id}';")
         connection.commit()
 
 
-async def send_search_db(id, disease):
+async def send_search_db(id, disease, index_of_search):
 
     connection = psycopg2.connect(
         host=host,
@@ -183,11 +157,33 @@ async def send_search_db(id, disease):
 
     with connection.cursor() as cur:
         for item in disease:
-            cur.execute(f"SELECT * FROM main_profil WHERE disease LIKE '%{item}%' AND indx NOT IN {list_already_added};")
+            cur.execute(f"SELECT * FROM main_profil WHERE disease LIKE '%{item}%' AND indx NOT IN {list_already_added} LIMIT 1000;")
             a = cur.fetchall()
 
             for i in a:
                 selected.append(i)
                 list_already_added = list_already_added + (f'{i[11]}',)
 
-        return selected
+        if len(selected) - int(index_of_search) == 1:
+            cur.execute(f"UPDATE main_profil SET ind1 = '{int(index_of_search) + 1}', ind2 = '{len(selected)}', ind3 = '1' WHERE indx = '{id}';")
+            connection.commit()
+        else:
+            cur.execute(f"UPDATE main_profil SET ind1 = '{int(index_of_search) + 1}', ind2 = '{len(selected)}' WHERE indx = '{id}';")
+            connection.commit()
+
+        return selected[int(index_of_search)]
+
+
+async def reset_search(id):
+
+    connection = psycopg2.connect(
+        host=host,
+        user=user,
+        password=password,
+        database=db_name
+    )
+    cursor = connection.cursor()
+
+    with connection.cursor() as cur:
+        cur.execute(f"UPDATE main_profil SET ind1 = '0', ind3 = '0' WHERE indx = '{id}';")
+        connection.commit()

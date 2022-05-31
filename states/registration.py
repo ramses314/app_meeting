@@ -2,7 +2,6 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 
 from loader import dp
 
-
 class Registration(StatesGroup):
     name = State()
     age = State()
@@ -16,10 +15,12 @@ class Registration(StatesGroup):
     desc_disease = State()
     phone = State()
 
-
 class EditingProfil(StatesGroup):
     begin = State()
     save = State()
 
 class ProfilOther(StatesGroup):
+    begin = State()
+
+class Claim(StatesGroup):
     begin = State()

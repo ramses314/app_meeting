@@ -3,7 +3,7 @@ from aiogram.dispatcher.filters import CommandStart, CommandHelp
 from aiogram.types import ParseMode, InlineKeyboardMarkup, InlineKeyboardButton
 
 from db.create_db import *
-from keyboards.kb_search import send_first_search
+from keyboards.kb_search import *
 from loader import dp, bot
 from states.registration import Registration
 
@@ -49,14 +49,15 @@ async def show_profil(message : types.Message):
 # начало поиска для знакомства
 @dp.message_handler(commands='search', state=None)
 async def send_search(message : types.Message):
-    a = (await send_profil(message.chat.id))[0][7]
-    selected = (await send_search_db(message.chat.id, a.split(',\n')))
+    a = (await send_profil(message.chat.id))
+    selected = (await send_search_db(message.chat.id, a[0][7].split(',\n'), a[0][13]))
     await send_first_search(message, selected)
 
 
 @dp.message_handler(state=None)
 async def bot_echo(message: types.Message):
-    await message.answer("создать профиль /create")
+    await message.answer("Поиск /search\n"
+                         "профиль /profil")
 
 
 # # Эхо хендлер, куда летят ВСЕ сообщения с указанным состоянием
