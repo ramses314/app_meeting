@@ -3,6 +3,7 @@ from aiogram.dispatcher.filters import CommandStart, CommandHelp
 from aiogram.types import ParseMode, InlineKeyboardMarkup, InlineKeyboardButton
 
 from db.create_db import *
+from keyboards.kb_admin import send_admin_panel
 from keyboards.kb_search import *
 from loader import dp, bot
 from states.registration import Registration
@@ -10,16 +11,20 @@ from states.registration import Registration
 
 @dp.message_handler(CommandStart())
 async def bot_start(message: types.Message):
-    await message.answer(f"Привет, зайчик)) не всегда бывает легко, здесь ты можешь найти поддержу у людей"
-                         f"с той же проблемой, что и у тебя, чтобы создать свой профиль нажми 👉🏼 /create "
-                         f"на это уйдет 2-3 минуты")
+    await message.answer(f"Привет, дорогуша 🤗 не всегда бывает легко, здесь ты можешь найти поддержу у людей "
+                         f"с той же проблемой, что и у тебя, чтобы создать свой профиль жми 👉🏼 /create "
+                       )
 
 
 @dp.message_handler(CommandHelp())
 async def bot_help(message: types.Message):
     text = ("Список команд: ",
             "/start - Начать диалог",
-            "/help - Получить справку")
+            "/create - Создать профиль",
+            "/search - Начать поиск",
+            "/profil - Мой профиль",
+            "/help - Получить справку",
+            )
     await message.answer("\n".join(text))
 
 
@@ -29,6 +34,15 @@ async def bot_help(message: types.Message):
 async def ask_name(message : types.Message):
     await Registration.name.set()
     await message.answer('Как ты хочешь, чтобы отображалось твое имя?')
+
+    # if len(await verify_user(message.chat.id)):
+    #     await message.answer('Ты уже зарегистрирован\nСвои пареметры можешь изменить в профиле /profil')
+    # else:
+    #     await Registration.name.set()
+    #     await message.answer('Как ты хочешь, чтобы отображалось твое имя?')
+    #
+
+
 
 # посмотреть свой профиль
 @dp.message_handler(commands='profil', state=None)
@@ -46,6 +60,7 @@ async def show_profil(message : types.Message):
     await bot.send_photo(message.chat.id, a[9], caption='\n'.join(text) ,parse_mode=ParseMode.MARKDOWN,
                          reply_markup=markup)
 
+
 # начало поиска для знакомства
 @dp.message_handler(commands='search', state=None)
 async def send_search(message : types.Message):
@@ -54,10 +69,22 @@ async def send_search(message : types.Message):
     await send_first_search(message, selected)
 
 
+# панель админа (+верификация)
+@dp.message_handler(commands='admin', state=None)
+async def send_search(message : types.Message):
+
+    if len(await verify_admin(message.chat.id)):
+        await send_admin_panel(message)
+    else:
+        await message.answer('Вы не являетесь админом')
+
+
+# Ответ на рандомное сообщение
 @dp.message_handler(state=None)
 async def bot_echo(message: types.Message):
-    await message.answer("Поиск /search\n"
-                         "профиль /profil")
+    await message.answer("🔎 Поиск /search\n"
+                         "👤 профиль /profil")
+
 
 
 # # Эхо хендлер, куда летят ВСЕ сообщения с указанным состоянием

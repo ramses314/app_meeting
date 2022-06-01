@@ -32,20 +32,34 @@ try:
         #     ');'
         # )
         # connection.commit()
+        #
+        # cur.execute(
+        #     'CREATE TABLE IF NOT EXISTS main_profil '
+        #     '(id SERIAL PRIMARY KEY,'
+        #     'name VARCHAR(100),'
+        #     'age INTEGER,'
+        #     'country VARCHAR(100),'
+        #     'city VARCHAR(100),'
+        #     'gender VARCHAR(100),'
+        #     'personality VARCHAR(100),'
+        #     'disease VARCHAR(100),'
+        #     'pain VARCHAR(100),'
+        #     'photo VARCHAR(100),'
+        #     'phone VARCHAR(100),'
+        #     'indx VARCHAR(100),'
+        #     'indy VARCHAR(100),'
+        #     'ind1 VARCHAR(100),'
+        #     'ind2 VARCHAR(100),'
+        #     'ind3 VARCHAR(100)'
+        #     ');'
+        # )
+        # connection.commit()
 
         cur.execute(
-            'CREATE TABLE IF NOT EXISTS main_profil '
+            'CREATE TABLE IF NOT EXISTS all_admin'
             '(id SERIAL PRIMARY KEY,'
             'name VARCHAR(100),'
-            'age INTEGER,'
-            'country VARCHAR(100),'
-            'city VARCHAR(100),'
-            'gender VARCHAR(100),'
-            'personality VARCHAR(100),'
-            'disease VARCHAR(100),'
-            'pain VARCHAR(100),'
-            'photo VARCHAR(100),'
-            'phone VARCHAR(100),'
+            'chat_id INTEGER,'
             'indx VARCHAR(100),'
             'indy VARCHAR(100),'
             'ind1 VARCHAR(100),'
@@ -187,3 +201,52 @@ async def reset_search(id):
     with connection.cursor() as cur:
         cur.execute(f"UPDATE main_profil SET ind1 = '0', ind3 = '0' WHERE indx = '{id}';")
         connection.commit()
+
+
+async def verify_admin(id):
+
+    connection = psycopg2.connect(
+        host=host,
+        user=user,
+        password=password,
+        database=db_name
+    )
+    cursor = connection.cursor()
+
+    with connection.cursor() as cur:
+        cur.execute(f"SELECT * FROM all_admin WHERE chat_id = '{id}';")
+        a = cur.fetchall()
+        return a
+
+
+
+async def select_admin():
+
+    connection = psycopg2.connect(
+        host=host,
+        user=user,
+        password=password,
+        database=db_name
+    )
+    cursor = connection.cursor()
+
+    with connection.cursor() as cur:
+        cur.execute(f"SELECT * FROM all_admin;")
+        a = cur.fetchall()
+        return a
+
+
+async def verify_user(id):
+
+    connection = psycopg2.connect(
+        host=host,
+        user=user,
+        password=password,
+        database=db_name
+    )
+    cursor = connection.cursor()
+
+    with connection.cursor() as cur:
+        cur.execute(f"SELECT * FROM all_admin WHERE chat_id = '{id}';")
+        a = cur.fetchall()
+        return a

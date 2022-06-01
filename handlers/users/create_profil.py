@@ -1,14 +1,15 @@
+from asyncio import sleep
+
 import psycopg2
-from aiogram import types
 
 from aiogram.dispatcher import FSMContext
-from aiogram.dispatcher.filters import CommandStart, CommandHelp, Text
+from aiogram.dispatcher.filters import Text
+from aiogram.types import ContentType
 
 from data.config import *
 from keyboards.kb_auth import *
-from loader import dp, bot
+from loader import dp
 from states.registration import Registration
-
 
 
 @dp.message_handler(state=Registration.name)
@@ -25,17 +26,17 @@ async def ask_age(message: types.Message, state:FSMContext):
 async def ask_place(message: types.Message, state: FSMContext):
 
     if message.text.isdigit():
-        if int(message.text) in range(0,99):
+        if int(message.text) in range(14,100):
             async with state.proxy() as data:
                 data['age'] = message.text
 
             await message.answer('Напиши свою страну и город через одну запятую\n'
-                                 'пример: "Россия, москва"')
+                                 '*Например: "Россия, москва"*', parse_mode=ParseMode.MARKDOWN)
             await Registration.next()
         else:
-            await message.answer('Введите корректный возраст))')
+            await message.answer('Введите корректный возраст 😅\nОн должен быть в промежутке 14-100 лет')
     else:
-        await message.answer('Введите корректный возраст))')
+        await message.answer('Введите корректный возраст 😅\nОн должен быть в промежутке 14-100 лет')
 
 
 @dp.message_handler(state=Registration.place)
@@ -49,7 +50,7 @@ async def ask_gender(message: types.Message, state: FSMContext):
         await Registration.next()
         await send_gender(message)
     else:
-        await message.answer('Вы ошиблись, давайтк еще раз')
+        await message.answer('Внимание, страна и город должны разделяться одной запятой 🤓')
 
 
 @dp.callback_query_handler(Text(startswith='mch2'),state=Registration.gender)
@@ -79,58 +80,46 @@ async def ask_diseas(callback: types.CallbackQuery, state: FSMContext):
     else:
         await send_disease(callback)
 
+
 @dp.callback_query_handler(Text(startswith='mch4'), state=Registration.personality)
 async def ask_diseas(callback: types.CallbackQuery, state: FSMContext):
-    async with state.proxy() as data:
-        data['disease'] = callback.data.split('_')[1]
-    await send_scale_of_pain(callback)
-    await Registration.next()
+
+    print(2222222222, callback.data.split('_')[1])
+    # может придумать более элегантное решение???
+    if callback.data.split('_')[1] != 'Зависимость':
+        async with state.proxy() as data:
+            data['disease'] = callback.data.split('_')[1]
+
+        await send_scale_of_pain(callback)
+        await Registration.next()
+    else:
+        await send_disease_addiction(callback)
+
 
 @dp.callback_query_handler(Text(startswith='mch5'), state=Registration.disease)
 async def asc_personality(callback: types.CallbackQuery, state: FSMContext):
 
     async with state.proxy() as data:
         data['scale_of_pain'] = callback.data.split('_')[1]
+        # переменная внизу для проверки количества выполнения следующией в машине состояний
+        # функции (иначе, если юзер отправляет несколько фотографий, все ломается!)
+        data['check_for_photo'] = 0
 
-    await callback.message.edit_text('Выбери самую классную фотку))) 🥸')
     await Registration.next()
-
-        # connection = psycopg2.connect(
-        #     host=host,
-        #     user=user,
-        #     password=password,
-        #     database=db_name
-        # )
-        # cursor = connection.cursor()
-        # a = data["name"]
-        # b = data["place"]
-        # c = data["age"]
-        # with connection.cursor() as cur:
-        #     cur.execute(f"INSERT INTO bot (name, sick, age) VALUES ('{a}','{b}','{c}');")
-        #     connection.commit()
+    await callback.message.edit_text('Выбери одну самую классную фотку 🤩  🔥🔥🔥')
 
 
 @dp.message_handler(content_types=['photo'], state=Registration.photo)
 async def ask_desk (message: types.Message, state: FSMContext):
+
     async with state.proxy() as data:
         data['photo'] = message.photo[-1].file_id
+        data['check_for_photo'] = data['check_for_photo'] + 1
 
-    # await bot.send_photo(message.from_user.id, f'{data["photo"]}')
+    if data['check_for_photo'] == 1:
+        await message.answer('Напиши 1-2 предложения о себе: что тебе нравится и что беспокоит))')
+        await Registration.next()
 
-    # connection = psycopg2.connect(
-    #     host=host,
-    #     user=user,
-    #     password=password,
-    #     database=db_name
-    # )
-    # cursor = connection.cursor()
-    #
-    # with connection.cursor() as cur:
-    #     cur.execute("SELECT * FROM bot")
-    #     a = cur.fetchall()
-    #     await message.answer(f'{a}')
-    await message.answer('Напиши 1-2 предложения о себе, что тебе нравиться и что беспокоит')
-    await Registration.next()
 
 @dp.message_handler(state=Registration.desc_disease)
 async def ask_contact(message : types.Message, state : FSMContext):
@@ -139,6 +128,7 @@ async def ask_contact(message : types.Message, state : FSMContext):
         data['desc_disease'] = message.text
     await send_phone(message)
     await Registration.next()
+
 
 @dp.message_handler(content_types=['contact'],  state=Registration.phone)
 async def save_and_warning(message : types.Message, state : FSMContext):
@@ -173,6 +163,8 @@ async def save_and_warning(message : types.Message, state : FSMContext):
                     )
         connection.commit()
 
-    await message.answer('Ну вот и все ищи единомышлеников /search')
+    # await message.delete()
+    await message.answer('Сообщение-предупреждение')
+    await message.answer('Ну вот и все 🥳 ищи единомышлеников 👉🏼 /search')
     await state.finish()
 
