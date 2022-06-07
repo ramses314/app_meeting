@@ -1,15 +1,13 @@
-from asyncio import sleep
-
 import psycopg2
 
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
-from aiogram.types import ContentType
 
 from data.config import *
-from keyboards.kb_auth import *
+from keyboards.kb_create import *
 from loader import dp
 from states.registration import Registration
+
 
 
 @dp.message_handler(state=Registration.name)
@@ -44,7 +42,6 @@ async def ask_gender(message: types.Message, state: FSMContext):
 
     if len(message.text.split(',')) == 2:
         async with state.proxy() as data:
-
             data['country'] = message.text.split(',')[0]
             data['city'] = message.text.split(',')[1]
         await Registration.next()
@@ -57,9 +54,8 @@ async def ask_gender(message: types.Message, state: FSMContext):
 async def ask_personality(callback : types.CallbackQuery, state : FSMContext):
 
     async with state.proxy() as data:
-        data['gender'] = callback.data
+        data['gender'] = callback.data.split('_')[1]
 
-# интровертность
         await send_personality(callback)
         await Registration.next()
 
@@ -69,14 +65,14 @@ async def ask_diseas(callback: types.CallbackQuery, state: FSMContext):
 
     a = callback.data.split('_')[1]
 
-    if a not in ('physical', 'crazy'):
+    if a not in ('physical', 'crazy', 'null'):
         async with state.proxy() as data:
             data['personality'] = a
 
     if a == 'physical':
-        await send_disease_some(callback, 'f')
+        await send_disease_some(callback, 'p')
     elif a == 'crazy':
-        await send_disease_some(callback, 'crazy')
+        await send_disease_some(callback, 'c')
     else:
         await send_disease(callback)
 
@@ -84,16 +80,14 @@ async def ask_diseas(callback: types.CallbackQuery, state: FSMContext):
 @dp.callback_query_handler(Text(startswith='mch4'), state=Registration.personality)
 async def ask_diseas(callback: types.CallbackQuery, state: FSMContext):
 
-    print(2222222222, callback.data.split('_')[1])
     # может придумать более элегантное решение???
     if callback.data.split('_')[1] != 'Зависимость':
         async with state.proxy() as data:
             data['disease'] = callback.data.split('_')[1]
-
         await send_scale_of_pain(callback)
         await Registration.next()
     else:
-        await send_disease_addiction(callback)
+        await send_disease_some(callback, 'a')
 
 
 @dp.callback_query_handler(Text(startswith='mch5'), state=Registration.disease)
@@ -101,12 +95,24 @@ async def asc_personality(callback: types.CallbackQuery, state: FSMContext):
 
     async with state.proxy() as data:
         data['scale_of_pain'] = callback.data.split('_')[1]
-        # переменная внизу для проверки количества выполнения следующией в машине состояний
-        # функции (иначе, если юзер отправляет несколько фотографий, все ломается!)
+        # переменная внизу для проверки количества выполнения следующией функции в машине состояний
+        # (иначе, если юзер отправляет несколько фотографий, все ломается!)
         data['check_for_photo'] = 0
 
     await Registration.next()
-    await callback.message.edit_text('Выбери одну самую классную фотку 🤩  🔥🔥🔥')
+    await callback.message.edit_text('Выбери одну самую классную фотку 🔥🔥🔥')
+
+
+# Можно добавить функционал, если пользователь не хочет выставлять свое фото (сомневаюсь нужно ли)
+# @dp.message_handler(commands='nofoto', state=Registration.photo)
+# async def ask_name(message : types.Message):
+#
+#     await send_for_not_photo(message)
+#
+# @dp.callback_query_handler(Text(startswith='nofoto'), state=Registration.photo)
+# async def asc_personality(callback: types.CallbackQuery, state: FSMContext):
+#
+#     await send_for_not_photo_two(callback.message)
 
 
 @dp.message_handler(content_types=['photo'], state=Registration.photo)
@@ -161,10 +167,10 @@ async def save_and_warning(message : types.Message, state : FSMContext):
                     f"pain, photo, phone, indx, indy) VALUES ('{a}', '{b}', '{c}', '{d}', '{e}', '{f}', '{g}',"
                     f" '{k}', '{l}', '{m}', '{n}', '{o}')"
                     )
+
+        cur.execute('UPDATE statistic SET all_user = all_user + 1 WHERE id = 1')
         connection.commit()
 
-    # await message.delete()
-    await message.answer('Сообщение-предупреждение')
-    await message.answer('Ну вот и все 🥳 ищи единомышлеников 👉🏼 /search')
+    # await message.answer('Какое-то предупредительное сообщение')
+    await message.answer('Ну вот и все 🥳 ищи единомышлеников 👉🏼 /search', reply_markup= types.ReplyKeyboardRemove())
     await state.finish()
-

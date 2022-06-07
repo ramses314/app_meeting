@@ -2,6 +2,7 @@ import psycopg2
 
 from data.config import *
 
+
 try:
     connection = psycopg2.connect(
         host = host,
@@ -34,7 +35,70 @@ try:
         # connection.commit()
         #
         # cur.execute(
-        #     'CREATE TABLE IF NOT EXISTS main_profil '
+        #     'CREATE TABLE IF NOT EXISTS check_claim '
+        #     '(id SERIAL PRIMARY KEY,'
+        #     'problem TEXT,'
+        #     'quilty INTEGER NOT NULL,'
+        #     'not_quilty INTEGER NOT NULL'
+        #     ');'
+        # )
+        # connection.commit()
+        #
+        # cur.execute(
+        #     'CREATE TABLE IF NOT EXISTS statistic '
+        #     '(id SERIAL PRIMARY KEY,'
+        #     'all_user INTEGER default 0'
+        #     ');'
+        # )
+        # connection.commit()
+        #
+        # cur.execute(
+        #     'CREATE TABLE IF NOT EXISTS Wishes '
+        #     '(id SERIAL PRIMARY KEY,'
+        #     'message TEXT,'
+        #     'chat_id INTEGER,'
+        #     'ind1 VARCHAR(80)'
+        #     ');'
+        # )
+        # connection.commit()
+
+        # cur.execute(
+        #     'CREATE TABLE IF NOT EXISTS blocked_users '
+        #     '(id SERIAL PRIMARY KEY,'
+        #     'chat_id INTEGER,'
+        #     'ind1 VARCHAR(80)'
+        #     ');'
+        # )
+        # connection.commit()
+
+        cur.execute(
+            'CREATE TABLE IF NOT EXISTS main_profil '
+            '(id SERIAL PRIMARY KEY,'
+            'name VARCHAR(100),'
+            'age INTEGER,'
+            'country VARCHAR(100),'
+            'city VARCHAR(100),'
+            'gender VARCHAR(100),'
+            'personality VARCHAR(100),'
+            'disease VARCHAR(100),'
+            'pain VARCHAR(100),'
+            'photo VARCHAR(100),'
+            'phone VARCHAR(100),'
+            'indx VARCHAR(100),'
+            'indy VARCHAR(100),'
+            'ind1 INTEGER default 0,'
+            'ind2 INTEGER default 0,'
+            'ind3 INTEGER default 0,'
+            'ind4 BOOLEAN NOT NULL DEFAULT TRUE,'
+            'created_at DATE not null default current_date,'
+            'stop_searching DATE,'
+            'last_activity DATE not null default current_date'
+            ');'
+        )
+        connection.commit()
+
+        # cur.execute(
+        #     'CREATE TABLE IF NOT EXISTS profil_stop_searching '
         #     '(id SERIAL PRIMARY KEY,'
         #     'name VARCHAR(100),'
         #     'age INTEGER,'
@@ -48,205 +112,35 @@ try:
         #     'phone VARCHAR(100),'
         #     'indx VARCHAR(100),'
         #     'indy VARCHAR(100),'
+        #     'ind1 INTEGER default 0,'
+        #     'ind2 INTEGER default 0,'
+        #     'ind3 INTEGER default 0,'
+        #     'created_at DATE not null default current_date,'
+        #     'last_activity timestamp not null default current_timestamp,'
+        #     ');'
+        # )
+        # connection.commit()
+        #
+        # cur.execute(
+        #     'CREATE TABLE IF NOT EXISTS all_admin'
+        #     '(id SERIAL PRIMARY KEY,'
+        #     'name VARCHAR(100),'
+        #     'chat_id INTEGER,'
+        #     'indx VARCHAR(100),'
+        #     'indy VARCHAR(100),'
         #     'ind1 VARCHAR(100),'
         #     'ind2 VARCHAR(100),'
         #     'ind3 VARCHAR(100)'
         #     ');'
         # )
         # connection.commit()
-
-        cur.execute(
-            'CREATE TABLE IF NOT EXISTS all_admin'
-            '(id SERIAL PRIMARY KEY,'
-            'name VARCHAR(100),'
-            'chat_id INTEGER,'
-            'indx VARCHAR(100),'
-            'indy VARCHAR(100),'
-            'ind1 VARCHAR(100),'
-            'ind2 VARCHAR(100),'
-            'ind3 VARCHAR(100)'
-            ');'
-        )
-        connection.commit()
+        print(26)
 
 except Exception as _ex:
-    print(['kmlmmlm'], _ex)
+    pass
 
 finally:
-    pass
     if connection:
         connection.close()
-        print('[INFO] PostgreSQL closed')
+        # print('[INFO] PostgreSQL closed')
 
-
-async def send_db_sick(table):
-    try:
-        connection = psycopg2.connect(
-            host=host,
-            user=user,
-            password=password,
-            database=db_name
-        )
-
-        cursor = connection.cursor()
-        with connection.cursor() as cur:
-            global v
-            v = cur.execute(f'SELECT * FROM sick_{table};')
-            return cur.fetchall()
-
-    except Exception as _ex:
-        print(['kmlmmlm'], _ex)
-
-    finally:
-        pass
-
-    return cur.fetchall()
-
-
-
-async def send_profil(id):
-
-    connection = psycopg2.connect(
-        host=host,
-        user=user,
-        password=password,
-        database=db_name
-    )
-    cursor = connection.cursor()
-
-    with connection.cursor() as cur:
-        cur.execute(f"SELECT * FROM main_profil WHERE indx = '{id}';")
-        a = cur.fetchall()
-        return a
-
-
-async def update_profil(table, value, id):
-
-    connection = psycopg2.connect(
-        host=host,
-        user=user,
-        password=password,
-        database=db_name
-    )
-
-    cursor = connection.cursor()
-
-    with connection.cursor() as cur:
-        cur.execute(
-            f"UPDATE main_profil SET {table} = '{value}' WHERE indx = '{id}';"
-        )
-        connection.commit()
-
-async def update_profil_add(table, value, id):
-
-    connection = psycopg2.connect(
-        host=host,
-        user=user,
-        password=password,
-        database=db_name
-    )
-
-    cursor = connection.cursor()
-
-    with connection.cursor() as cur:
-        cur.execute(f"SELECT disease FROM main_profil WHERE indx = '{id}';")
-        a = cur.fetchall()
-        b = ',\n'
-        cur.execute(f"UPDATE main_profil SET {table} = '{a[0][0]}{b}{value}' WHERE indx = '{id}';")
-        connection.commit()
-
-
-async def send_search_db(id, disease, index_of_search):
-
-    connection = psycopg2.connect(
-        host=host,
-        user=user,
-        password=password,
-        database=db_name
-    )
-    cursor = connection.cursor()
-
-    selected = []
-    list_already_added = ('some', f'{id}',)
-
-    with connection.cursor() as cur:
-        for item in disease:
-            cur.execute(f"SELECT * FROM main_profil WHERE disease LIKE '%{item}%' AND indx NOT IN {list_already_added} LIMIT 1000;")
-            a = cur.fetchall()
-
-            for i in a:
-                selected.append(i)
-                list_already_added = list_already_added + (f'{i[11]}',)
-
-        if len(selected) - int(index_of_search) == 1:
-            cur.execute(f"UPDATE main_profil SET ind1 = '{int(index_of_search) + 1}', ind2 = '{len(selected)}', ind3 = '1' WHERE indx = '{id}';")
-            connection.commit()
-        else:
-            cur.execute(f"UPDATE main_profil SET ind1 = '{int(index_of_search) + 1}', ind2 = '{len(selected)}' WHERE indx = '{id}';")
-            connection.commit()
-
-        return selected[int(index_of_search)]
-
-
-async def reset_search(id):
-
-    connection = psycopg2.connect(
-        host=host,
-        user=user,
-        password=password,
-        database=db_name
-    )
-    cursor = connection.cursor()
-
-    with connection.cursor() as cur:
-        cur.execute(f"UPDATE main_profil SET ind1 = '0', ind3 = '0' WHERE indx = '{id}';")
-        connection.commit()
-
-
-async def verify_admin(id):
-
-    connection = psycopg2.connect(
-        host=host,
-        user=user,
-        password=password,
-        database=db_name
-    )
-    cursor = connection.cursor()
-
-    with connection.cursor() as cur:
-        cur.execute(f"SELECT * FROM all_admin WHERE chat_id = '{id}';")
-        a = cur.fetchall()
-        return a
-
-
-
-async def select_admin():
-
-    connection = psycopg2.connect(
-        host=host,
-        user=user,
-        password=password,
-        database=db_name
-    )
-    cursor = connection.cursor()
-
-    with connection.cursor() as cur:
-        cur.execute(f"SELECT * FROM all_admin;")
-        a = cur.fetchall()
-        return a
-
-
-async def verify_user(id):
-
-    connection = psycopg2.connect(
-        host=host,
-        user=user,
-        password=password,
-        database=db_name
-    )
-    cursor = connection.cursor()
-
-    with connection.cursor() as cur:
-        cur.execute(f"SELECT * FROM all_admin WHERE chat_id = '{id}';")
-        a = cur.fetchall()
-        return a

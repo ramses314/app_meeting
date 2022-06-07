@@ -24,3 +24,6 @@ class ProfilOther(StatesGroup):
 
 class Claim(StatesGroup):
     begin = State()
+
+class ForAdmin(StatesGroup):
+    begin = State()

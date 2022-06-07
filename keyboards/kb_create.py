@@ -1,7 +1,7 @@
 from aiogram import types
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, ParseMode, KeyboardButton, ReplyKeyboardMarkup
 
-from db.create_db import send_db_sick
+from db.function_db import send_db_sick
 
 
 async def send_gender(message : types.Message):
@@ -12,13 +12,14 @@ async def send_gender(message : types.Message):
     markup.row(but1, but2, but3)
     await message.answer('Теперь выбери свой пол', reply_markup=markup)
 
+
 async def send_personality(callback : types.CallbackQuery):
     markup = InlineKeyboardMarkup()
     but1 = InlineKeyboardButton('Экстраверт', callback_data="mch3_экстраверт")
     but2 = InlineKeyboardButton('Интроверт', callback_data="mch3_интроверт")
     but3 = InlineKeyboardButton('Амбиветр', callback_data="mch3_амбиветр")
     markup.row(but1, but3, but2)
-    await callback.message.edit_text('Какой у тебя тип характера?'
+    await callback.message.edit_text('Какой у тебя тип характера? 🤔'
                                      '\n\nAмбиверт – это человек, которому свойственны '
                                      'проявления поведения и интроверта, и экстраверта.', reply_markup=markup)
 
@@ -30,6 +31,7 @@ async def send_disease(callback : types.CallbackQuery):
     markup.row(but1, but2)
     await callback.message.edit_text('С какой сложностью ты столкнулся? 🥺 Выбери одну основную проблему, потом ты сможешь '
                                       'добавить дополнительные симптомы', reply_markup=markup)
+    await callback.answer()
 
 
 async def send_disease_some(callback : types.CallbackQuery, type_of_table):
@@ -41,19 +43,7 @@ async def send_disease_some(callback : types.CallbackQuery, type_of_table):
     but_x = InlineKeyboardButton('Назад', callback_data='mch3_null')
     markup.row(but_x)
     await callback.message.edit_text('Выбери подпункт 💁🏼‍♀️', reply_markup=markup)
-
-
-async def send_disease_addiction(callback : types.CallbackQuery):
-    markup = InlineKeyboardMarkup()
-    but1 = InlineKeyboardButton('Алкоголь', callback_data="mch4_")
-    but2 = InlineKeyboardButton('Курение', callback_data="mch4_")
-    but3 = InlineKeyboardButton('Психоактивные "вещества"', callback_data="mch4_")
-    but4 = InlineKeyboardButton('Еда', callback_data="mch4_")
-    but5 = InlineKeyboardButton('серфинг в интернете-игры и т.д.', callback_data="mch4_")
-    but6 = InlineKeyboardButton('другое', callback_data="mch4_")
-    but7 = InlineKeyboardButton('назад', callback_data="mch3_crazy")
-    markup.row(but1).row(but2).row(but3).row(but4).row(but5).row(but6).row(but7)
-    await callback.message.edit_text('Какого рода зависимость? 🥴️', reply_markup=markup)
+    await callback.answer()
 
 
 async def send_scale_of_pain(callback : types.CallbackQuery):
@@ -77,4 +67,26 @@ async def send_phone(message : types.Message):
     markup = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
     markup.add(but_1)
     await message.answer('Теперь поделись контактом для будущей верификации', reply_markup=markup)
+
+
+# Ниже на случай если пользователь не хочет загружать свое фото
+# Сомневаюсь добавлять это в функционал, так как если появиться такая возможность, есть вероятность,
+# что все станут ей пользоваться
+# async def send_for_not_photo(message : types.Message):
+#     markup = InlineKeyboardMarkup()
+#     but1 = InlineKeyboardButton('Стесняюсь себя', callback_data="nofoto")
+#     but2 = InlineKeyboardButton('Не люблю фотаться', callback_data="nofoto")
+#     but3 = InlineKeyboardButton('Не хочу', callback_data="nofoto")
+#     but4 = InlineKeyboardButton('Не важно', callback_data="nofoto")
+#     markup.row(but1, but2, but4)
+#     await message.answer('По какой причине не хочешь?', reply_markup=markup)
+#
+# async def send_for_not_photo_two(message : types.Message):
+#     markup = InlineKeyboardMarkup()
+#     but1 = InlineKeyboardButton('Животные', callback_data="nofoto")
+#     but2 = InlineKeyboardButton('Аниме', callback_data="nofoto")
+#     but3 = InlineKeyboardButton('Эмоджи', callback_data="nofoto")
+#     markup.row(but1, but2, but3)
+#     await message.answer('Ничего страшного, ты имеешь на это право, выбери лучше, какая тема тебе больше нравиться', reply_markup=markup)
+
 
