@@ -1,0 +1,14 @@
+[Unit]
+Description=Telegram Bot
+After=network.target
+
+[Service]
+User=leo
+Group=leo
+
+WorkingDirectory=/home/leo/meet/app_meeting/
+Environment="PYTHONPATH=/home/leo/meet/app_meeting/"
+ExecStart=/home/leo/TZXI/TAXI/.venv/bin/python /home/leo/meet/app_meeting/main.py
+
+[Install]
+WantedBy=multi-user.target

@@ -41,7 +41,7 @@ async def on_startup(dispatcher):
 #         connection.close()
 #         print('[INFO] PostgreSQL closed')
 
-
+# 5469372424:AAFdFRnDO4dHjv0-eM05ZvNIcbNv5u6t7K4
 
 if __name__ == '__main__':
     executor.start_polling(dp, on_startup=on_startup, skip_updates=True)

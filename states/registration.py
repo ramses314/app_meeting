@@ -14,6 +14,7 @@ class Registration(StatesGroup):
     photo = State()
     desc_disease = State()
     phone = State()
+    end = State()
 
 class EditingProfil(StatesGroup):
     begin = State()
@@ -26,4 +27,7 @@ class Claim(StatesGroup):
     begin = State()
 
 class ForAdmin(StatesGroup):
+    begin = State()
+
+class BeAdmin(StatesGroup):
     begin = State()

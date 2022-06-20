@@ -1,4 +1,5 @@
 from aiogram import types
+from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import CommandStart, CommandHelp
 from aiogram.types import ParseMode, InlineKeyboardMarkup, InlineKeyboardButton
 
@@ -6,26 +7,36 @@ from db.function_db import *
 from keyboards.kb_admin import send_admin_panel
 from keyboards.kb_search import *
 from loader import dp, bot
-from states.registration import Registration
-
+from states.registration import Registration, BeAdmin
 
 
 @dp.message_handler(CommandStart())
 async def bot_start(message: types.Message):
-    await message.answer(f"Привет 🤗 здесь ты можешь найти поддержу у людей "
-                         f"с той же проблемой, что и у тебя. Создай свой профиль, жмякай 👉🏼 /create ")
+    await message.answer(f"Привет, меня зовут Бруно 🤗 здесь ты можешь найти поддержу у людей "
+                         f"с той же проблемой, что и у тебя. Создай свой профиль, жмякай 👉🏼 /create")
+                         # f"\nЕсли ты здесь для регистрации на сайте, то 👉🏼 /get_login")
 
 
 @dp.message_handler(CommandHelp())
 async def bot_help(message: types.Message):
-    text = ("Список команд: ",
-            "/start - Начать диалог",
-            "/create - Создать профиль",
+    text = ("Список команд 📋 ",
             "/search - Начать поиск",
             "/profil - Мой профиль",
+            "/start - Начать диалог",
+            "/create - Создать профиль",
+            "/stop_searching - Включить невидимку",
+            "/lets_search - Выключить невидимку",
             "/help - Получить справку",
+            "",
+            'В центр поддержки можете обратиться через "мой профиль (/profil) ➡️ другое ➡️ оставить пожелание"'
             )
     await message.answer("\n".join(text))
+
+# @dp.message_handler(commands='get_login')
+# async def bot_help(message: types.Message):
+#
+#     await message.answer(f'Привет, вот твои данные для входа на сайт'
+#                          f'\nЛогин : {message.chat.id},\n Пароль : 1234')
 
 
 # начало создания профиля
@@ -36,6 +47,9 @@ async def create_my_profil(message : types.Message):
     # await message.answer('Как ты хочешь, чтобы отображалось твое имя?')
 
     identity = await verify_user(message.chat.id)
+
+    if message.chat.id == 1087882216:
+        identity = 10
 
     if identity == 'already_registered':
         await message.answer('Ты уже зарегистрирован\nСвои пареметры можешь изменить в профиле /profil')
@@ -59,6 +73,7 @@ async def show_profil(message : types.Message):
         markup = InlineKeyboardMarkup()
         but1 = InlineKeyboardButton('Смотреть все параметры', callback_data="profil_all")
         but2 = InlineKeyboardButton('другое', callback_data="other_bull")
+        but3 = InlineKeyboardButton('Данные для входа на сайт', callback_data='login')
         markup.row(but1).row(but2)
         text = [f'*{a[1]}*, *{a[2]}*, {a[6]}',
                 f'*Чувствую себя на {10 - int(a[8])} из 10*',
@@ -105,17 +120,25 @@ async def send_search(message : types.Message):
     await message.answer('Хаю-хай 😁 ты снова в деле)))')
 
 
+@dp.message_handler(commands='stop_search', state=None)
+async def send_search(message : types.Message):
+    await stop_searching(False, message.chat.id)
+    await message.answer('Ценим твое желание побыть одному/ой 😌 твой профиль не будет виден другим в течении '
+                                      '2 недель, чтобы вновь стать видимым нажми 👉🏼 /lets_search')
+
+
+# Снова делает невидимого ("спящего") пользователя видимым
+@dp.message_handler(commands='be_admin', state=None)
+async def send_search(message : types.Message):
+
+    await message.answer('Введите код доступа:')
+    await BeAdmin.begin.set()
+
+
 # Ответ на рандомное сообщение
 @dp.message_handler(state=None)
 async def bot_echo(message: types.Message):
-    await message.answer("🔎 Поиск /search\n"
-                         "👤 профиль /profil")
-
-
-# # Эхо хендлер, куда летят ВСЕ сообщения с указанным состоянием (удалить????)
-# @dp.message_handler(state="*", content_types=types.ContentTypes.ANY)
-# async def bot_echo_all(message: types.Message, state: FSMContext):
-#     state = await state.get_state()
-#     await message.answer(f"Эхо в состоянии <code>{state}</code>.\n"
-#                          f"\nСодержание сообщения:\n"
-#                          f"<code>{message}</code>")
+    await message.answer("Алоха 😇🌴🐼\n"
+                         "Поиск --  /search\n"
+                         "Профиль -- /profil"
+                    )

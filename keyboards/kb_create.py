@@ -8,8 +8,8 @@ async def send_gender(message : types.Message):
     markup = InlineKeyboardMarkup()
     but1 = InlineKeyboardButton('Мужской', callback_data="mch2_парень_gender")
     but2 = InlineKeyboardButton('Женский', callback_data="mch2_девушка_gender")
-    but3 = InlineKeyboardButton('Другое 🧬', callback_data="mch2_другое_gender")
-    markup.row(but1, but2, but3)
+    # but3 = InlineKeyboardButton('Другое 🧬', callback_data="mch2_другое_gender")
+    markup.row(but1, but2)
     await message.answer('Теперь выбери свой пол', reply_markup=markup)
 
 
@@ -66,7 +66,19 @@ async def send_phone(message : types.Message):
     but_1 = KeyboardButton('👉🏼 Поделиться контактом 👈🏼', request_contact=True)
     markup = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
     markup.add(but_1)
-    await message.answer('Теперь поделись контактом для будущей верификации', reply_markup=markup)
+    await message.answer('Теперь поделись контактом для будущей верификации (нажми на кнопку ниже)👇🏼👇🏼👇🏼', reply_markup=markup)
+
+
+async def send_ending(message : types.Message):
+    markup = InlineKeyboardMarkup()
+    but_1 = InlineKeyboardButton('Принимаю', callback_data='yes')
+    but_2 = InlineKeyboardButton('Отказываюсь', callback_data='no')
+    markup.add(but_1, but_2)
+    await message.answer('❗️Помни, что в интернете люди могут выдавать себя за других и '
+                         'опубликовывать недостоверную информацию. Продолжая ты соглашаешься с '
+                         'возможными рисками и сам за себя несешь ответсвенность.', reply_markup=markup)
+
+
 
 
 # Ниже на случай если пользователь не хочет загружать свое фото

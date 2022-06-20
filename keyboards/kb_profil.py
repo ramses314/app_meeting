@@ -29,11 +29,11 @@ async def send_panel_profil_for_edit():
 
 async def send_gender_for_edit(callback : types.CallbackQuery):
     markup = InlineKeyboardMarkup()
-    but1 = InlineKeyboardButton('Парень', callback_data="redact_парень")
-    but2 = InlineKeyboardButton('Девушка', callback_data="redact_девушка")
-    but3 = InlineKeyboardButton('Другое', callback_data="redact_другое")
-    markup.row(but1, but2, but3)
-    await callback.message.answer('Теперь выбери свой гендер', reply_markup=markup)
+    but1 = InlineKeyboardButton('Мужской', callback_data="redact_парень")
+    but2 = InlineKeyboardButton('Женский', callback_data="redact_девушка")
+    # but3 = InlineKeyboardButton('Другое 🧬', callback_data="redact_другое")
+    markup.row(but1, but2)
+    await callback.message.answer('Выбери свой пол', reply_markup=markup)
     await callback.answer()
 
 
@@ -59,7 +59,7 @@ async def send_pain_for_edit(callback : types.CallbackQuery):
     but9 = InlineKeyboardButton('9', callback_data="redact_9")
     but10 = InlineKeyboardButton('10', callback_data="redact_10")
     markup.row(but1, but2, but3, but4, but5).row(but6, but7, but8, but9, but10)
-    await callback.message.answer('Оцени свою боль по десятибальной шкале', reply_markup=markup)
+    await callback.message.answer('Оцени свою боль по десятибальной шкале 😔', reply_markup=markup)
 
 
 async def send_disease_for_edit(callback : types.CallbackQuery):
@@ -82,7 +82,6 @@ async def send_disease_for_redact(callback : types.CallbackQuery, value):
 async def send_disease_some_for_redact(callback : types.CallbackQuery, type_of_table):
     markup = InlineKeyboardMarkup()
     a = await send_db_sick(type_of_table)
-    print(666666666666666666666, type_of_table)
 
     for i in a:
         but = InlineKeyboardButton(f'{i[1]}', callback_data=f'SR_{i[1]}_{callback.data.split("_")[2]}')

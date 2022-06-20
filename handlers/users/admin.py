@@ -23,10 +23,11 @@ async def send_admins(callback : types.CallbackQuery, state : FSMContext):
     elif split == 'statistic':
         statistic = await collect_statistic()
         markup = InlineKeyboardMarkup().row(InlineKeyboardButton('Назад', callback_data="check_same"))
-        text = [
-            f'Общее количество пользователей: {statistic[1]}'
-        ]
-        await callback.message.edit_text('\n'.join(text), reply_markup=markup)
+        # text = [
+        #     f'👤 Общее кол-во пользователей: {statistic[1]}',
+        #     f'😴 Кол-во спящих пользователей: {statistic[2]}'
+        # ]
+        await callback.message.edit_text('\n'.join(statistic), reply_markup=markup)
     elif split == 'block':
         await send_block(callback)
         await ForAdmin.begin.set()
@@ -98,6 +99,9 @@ async def do_some(callback : types.CallbackQuery, state : FSMContext):
         await callback.answer()
         async with state.proxy() as data:
             data['what_do'] = 'del_admin'
+    elif split == 'default':
+        await admin_default(callback.message.chat.id)
+        await callback.message.answer('Произведен дефолт админского аккаунта')
 
 
 @dp.callback_query_handler(Text(startswith='do'), state=ForAdmin.begin)
@@ -127,9 +131,10 @@ async def do_some(message: types.Message, state: FSMContext):
         elif data['what_do'] == 'send_message':
             selected = await select_admin()
             for i in selected:
-                message = ['📌 Сообщение для всех админов:',
+                text = ['📌 Сообщение для всех админов:',
                            f'"{message.text}"']
-                await bot.send_message(chat_id=i[2], text='\n'.join(message))
+                await bot.send_message(chat_id=i[2], text='\n'.join(text))
+                await state.finish()
         elif data['what_do'] == 'del_admin':
             try:
                 x = int(message.text)
@@ -161,3 +166,24 @@ async def do_some(message: types.Message, state: FSMContext):
         await state.finish()
 
 
+# Регистрация адимна
+@dp.message_handler(state=BeAdmin.begin)
+async def send_search(message: types.Message, state : FSMContext):
+
+    if message.text == '7891':
+        if message.from_user.username:
+            await make_admin(message.from_user.username, message.chat.id)
+        else:
+            await make_admin('someadmin', message.chat.id)
+        await message.answer('Поздравляем, теперь вы админ /admin')
+    else:
+        await message.answer('Неверный код доступа')
+    await state.finish()
+
+
+# Эхо хендлер, куда летят ВСЕ сообщения с указанным состоянием (удалить????)
+@dp.message_handler(state="*", content_types=types.ContentTypes.ANY)
+async def bot_echo_all(message: types.Message, state: FSMContext):
+    # state = await state.get_state()
+    await message.answer(f"Ерунда")
+    await state.finish()

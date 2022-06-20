@@ -18,58 +18,63 @@ async def send_search(callback : types.CallbackQuery):
     split = callback.data.split('_')[1]
     own_profil = (await send_profil(callback.message.chat.id))
 
-    if own_profil[0][15] != '1':
+    if own_profil[0][15] != 1:
         if split == 'go':
             selected = (await send_search_db(callback.message.chat.id, own_profil[0][7].split(',\n'), own_profil[0][13]))
             await send_next_search(callback, selected)
         elif split == 'heart':
             selected = (await send_search_db(callback.message.chat.id, own_profil[0][7].split(',\n'), own_profil[0][13]))
             chat_id = callback.data.split('_')[2]
+
             text = [f'*{own_profil[0][1]}*, *{own_profil[0][2]}*, {own_profil[0][6]}',
-                    f'*Чувствую себя на {own_profil[0][8]} из 10*',
+                    f'*Чувствую себя на {10 - int(own_profil[0][8])} из 10*',
                     f'*Моя проблема*: {own_profil[0][7]}',
                     f'"{own_profil[0][12]}"',
-                    f"\n\n\nТы можешь [👉🏼 написать ему 👈🏼](tg://user?id={callback.message.chat.id})"
+                    f"\nТы можешь [👉🏼 написать 👈🏼](tg://user?id={callback.message.chat.id})"
                         ]
-            await bot.send_message(chat_id=chat_id, text=f"Пользователь поставил тебе лайк!😸")
-            await bot.send_photo(chat_id=chat_id, photo=own_profil[0][9], caption='\n'.join(text),
+            try:
+                await bot.send_photo(chat_id=chat_id, photo=own_profil[0][9], caption='\n'.join(text),
                                  parse_mode=ParseMode.MARKDOWN)
-
+                await bot.send_message(chat_id=chat_id, text=f"👆🏼 Пользователь проявил к тебе интерес\n/stop_search -- сделать перерыв")
+            except:
+                pass
             await callback.message.answer('Симпатия отправлена ❤️')
             await sleep(0.7)
             await send_next_search(callback, selected)
 
         else:
-            await callback.message.delete()
+            # await callback.message.delete()
             await callback.message.answer('Всего хорошего)))\n/search\n/profil')
     else:
         if split == 'heart':
             chat_id = callback.data.split('_')[2]
             text = [f'*{own_profil[0][1]}*, *{own_profil[0][2]}*, {own_profil[0][6]}',
-                    f'*Чувствую себя на {own_profil[0][8]} из 10*',
+                    f'*Чувствую себя на {10 - int(own_profil[0][8])} из 10*',
                     f'*Моя проблема*: {own_profil[0][7]}',
                     f'"{own_profil[0][12]}"',
-                    f"\nТы можешь [👉🏼 написать человеку 👈🏼](tg://user?id={callback.message.chat.id})"
+                    f"\nТы можешь [👉🏼 написать 👈🏼](tg://user?id={callback.message.chat.id})"
                     ]
-            await bot.send_message(chat_id=chat_id, text=f"Пользователь поставил тебе лайк!😸")
-            await bot.send_photo(chat_id=chat_id, photo=own_profil[0][9], caption='\n'.join(text),
+            try:
+                await bot.send_photo(chat_id=chat_id, photo=own_profil[0][9], caption='\n'.join(text),
                                  parse_mode=ParseMode.MARKDOWN)
-
+                await bot.send_message(chat_id=chat_id, text=f"👆🏼 Пользователь проявил к тебе интерес\n/stop_search -- сделать перерыв")
+            except:
+                pass
             await callback.message.answer('Симпатия отправлена ❤️')
-            await callback.message.delete()
             await reset_search(callback.message.chat.id)
-            await callback.message.answer('На сегодня люди схожими с вашими проблемами кончились /search')
+            # await callback.message.delete()
+            # await callback.message.answer('На сегодня люди с схожими с вашими проблемами кончились /search')
 
         await callback.message.delete()
         await reset_search(callback.message.chat.id)
-        await callback.message.answer('На сегодня люди схожими с вашими проблемами кончились /search')
+        await callback.message.answer('На сегодня люди с схожими с вашими проблемами кончились /search')
 
 
 @dp.callback_query_handler(Text(startswith='claim'))
 async def rise_claim(callback : types.CallbackQuery, state : FSMContext):
 
     own_profil = (await send_profil(callback.message.chat.id))
-    if own_profil[0][15] == '1':
+    if own_profil[0][15] == 1:
         await reset_search(callback.message.chat.id)
 
     await callback.message.delete()

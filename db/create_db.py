@@ -1,3 +1,6 @@
+import random
+from random import randint
+
 import psycopg2
 
 from data.config import *
@@ -44,14 +47,25 @@ try:
         # )
         # connection.commit()
         #
-        # cur.execute(
-        #     'CREATE TABLE IF NOT EXISTS statistic '
-        #     '(id SERIAL PRIMARY KEY,'
-        #     'all_user INTEGER default 0'
-        #     ');'
-        # )
-        # connection.commit()
-        #
+        cur.execute(
+            'CREATE TABLE IF NOT EXISTS statistic '
+            '(id SERIAL PRIMARY KEY,'
+            'all_user INTEGER default 0,'
+            'sleep_user INTEGER default 0'
+            ');'
+        )
+        connection.commit()
+
+        cur.execute(
+            'CREATE TABLE IF NOT EXISTS login_web'
+            '(id SERIAL PRIMARY KEY,'
+            'chat_id INTEGER default 0,'
+            'passw VARCHAR(10) default 0,'
+            'phone VARCHAR(30)'
+            ');'
+        )
+        connection.commit()
+
         # cur.execute(
         #     'CREATE TABLE IF NOT EXISTS Wishes '
         #     '(id SERIAL PRIMARY KEY,'

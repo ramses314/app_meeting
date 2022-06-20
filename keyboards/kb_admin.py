@@ -27,7 +27,8 @@ async def send_admins_from_kb(callback : types.CallbackQuery):
     but2 = InlineKeyboardButton('Удалить админа', callback_data="admins_deleteadmin")
     but3 = InlineKeyboardButton('Показать код доступа', callback_data="admins_showpass")
     but4 = InlineKeyboardButton('Назад', callback_data="check_same")
-    markup.row(but1, but2).row(but3).row(but4)
+    but5 = InlineKeyboardButton('Дефолт', callback_data="admins_default")
+    markup.row(but1, but2).row(but3).row(but5).row(but4)
 
     selected = await select_admin()
     text = ['Список админов:',]
@@ -59,7 +60,7 @@ async  def send_claims(callback : types.CallbackQuery,  check):
     but4 = InlineKeyboardButton('Назад', callback_data="check_stop")
     markup.row(but1, but2, but3).row(but4)
     await callback.message.delete()
-    if claims == 'pop':
+    if claims == 'empty':
         await callback.message.answer('Список жалоб пуст /admin')
     else:
         a = (await send_profil(claims[2]))[0]

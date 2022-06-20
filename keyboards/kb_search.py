@@ -13,10 +13,9 @@ async def send_first_search(message : types.Message, selected):
     markup.row(but1, but2, but3).row(but4)
 
     text = [
-        f'{selected[1]}, {selected[2]}',
-        f'{selected[6]}',
-        f"Моя проблема: {selected[7]}",
-        f"Мне плохо на {selected[8]} из 10",
+        f'*{selected[1]}, {selected[2]}*, {selected[6]}',
+        f"*Чувствую себя на {10 - int(selected[8])} из 10*",
+        f"*Моя проблема*: {selected[7]}",
         f'"{selected[12]}"'
     ]
 
@@ -33,12 +32,12 @@ async def send_next_search(callback : types.CallbackQuery, selected):
     markup.row(but1, but2, but3).row(but4)
 
     text = [
-        f'{selected[1]}, {selected[2]}',
-        f'{selected[6]}',
-        f"Моя проблема: {selected[7]}",
-        f"Мне плохо на {selected[8]} из 10",
+        f'*{selected[1]}, {selected[2]}*, {selected[6]}',
+        f"*Чувствую себя на {10 - int(selected[8])} из 10*",
+        f"*Моя проблема*: {selected[7]}",
         f'"{selected[12]}"'
     ]
+
     await callback.message.delete()
     await bot.send_photo(callback.message.chat.id, selected[9], caption='\n'.join(text), parse_mode=ParseMode.MARKDOWN,
                          reply_markup=markup)
