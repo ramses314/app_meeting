@@ -1,7 +1,7 @@
 import random
 from random import randint
 
-import psycopg2
+import psycopg2-binary
 
 from data.config import *
 
