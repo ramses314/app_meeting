@@ -3,7 +3,7 @@ from random import randint
 
 import psycopg2
 
-from .data.config import *
+from data.config import *
 
 
 try:
