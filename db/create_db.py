@@ -8,10 +8,10 @@ from data.config import *
 
 try:
     connection = psycopg2.connect(
-        host = host,
-        user = user,
-        password = password,
-        database = db_name
+        host = "127.0.0.1",
+        user = "postgres",
+        password = "gtx97",
+        database = "postgres"
     )
 
     cursor = connection.cursor()
